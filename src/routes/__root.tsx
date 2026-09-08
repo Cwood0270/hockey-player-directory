@@ -1,5 +1,6 @@
 import { HeadContent, Outlet, Scripts, createRootRoute } from '@tanstack/react-router'
 
+import { AppNav } from '../components/AppNav'
 import appCss from '../styles.css?url'
 
 // __root.tsx is the top-level layout route. It has no URL of its own.
@@ -26,29 +27,17 @@ export const Route = createRootRoute({
       },
     ],
   }),
-  // TanStack Start document wrapper: html / head / body only.
+  // TanStack Start document wrapper: html / head / body.
+  // Shared chrome lives here so client navigations keep the shell mounted.
   shellComponent: RootDocument,
-  // Shared staff chrome. Child routes render through <Outlet />.
+  // Child pages render through <Outlet />.
   component: RootLayout,
+  // Unknown URLs (favicon, leftover /about) should not crash the shell.
+  notFoundComponent: () => <p className="p-6 text-slate-700">Page not found</p>,
 })
 
 function RootLayout() {
-  return (
-    <>
-      <header className="border-b border-[var(--line)] bg-[var(--header-bg)] px-4 py-3">
-        <p className="m-0 text-base font-semibold tracking-tight text-[var(--sea-ink)]">
-          Hockey Ops Directory
-        </p>
-        {/* Full nav (Players / Games links) comes in a later step. */}
-        <nav aria-label="Directory" className="sr-only">
-          Directory navigation placeholder
-        </nav>
-      </header>
-      <main>
-        <Outlet />
-      </main>
-    </>
-  )
+  return <Outlet />
 }
 
 function RootDocument({ children }: { children: React.ReactNode }) {
@@ -58,6 +47,12 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body className="font-sans antialiased">
+        <header className="border-b border-[var(--line)] bg-[var(--header-bg)] px-4 py-3">
+          <p className="m-0 text-base font-semibold tracking-tight text-[var(--sea-ink)]">
+            Hockey Ops Directory
+          </p>
+        </header>
+        <AppNav />
         {children}
         <Scripts />
       </body>
