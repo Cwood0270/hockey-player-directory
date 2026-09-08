@@ -1,13 +1,9 @@
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
-import Footer from '../components/Footer'
-import Header from '../components/Header'
+import { HeadContent, Outlet, Scripts, createRootRoute } from '@tanstack/react-router'
 
 import appCss from '../styles.css?url'
 
-const THEME_INIT_SCRIPT = `(function(){try{var stored=window.localStorage.getItem('theme');var mode=(stored==='light'||stored==='dark'||stored==='auto')?stored:'auto';var prefersDark=window.matchMedia('(prefers-color-scheme: dark)').matches;var resolved=mode==='auto'?(prefersDark?'dark':'light'):mode;var root=document.documentElement;root.classList.remove('light','dark');root.classList.add(resolved);if(mode==='auto'){root.removeAttribute('data-theme')}else{root.setAttribute('data-theme',mode)}root.style.colorScheme=resolved;}catch(e){}})();`
-
+// __root.tsx is the top-level layout route. It has no URL of its own.
+// Every later page (home, players, player detail, games) renders inside it.
 export const Route = createRootRoute({
   head: () => ({
     meta: [
@@ -19,7 +15,8 @@ export const Route = createRootRoute({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'TanStack Start Starter',
+        // Product name staff see in the tab on arena wifi.
+        title: 'Hockey Ops Directory',
       },
     ],
     links: [
@@ -29,31 +26,39 @@ export const Route = createRootRoute({
       },
     ],
   }),
+  // TanStack Start document wrapper: html / head / body only.
   shellComponent: RootDocument,
+  // Shared staff chrome. Child routes render through <Outlet />.
+  component: RootLayout,
 })
+
+function RootLayout() {
+  return (
+    <>
+      <header className="border-b border-[var(--line)] bg-[var(--header-bg)] px-4 py-3">
+        <p className="m-0 text-base font-semibold tracking-tight text-[var(--sea-ink)]">
+          Hockey Ops Directory
+        </p>
+        {/* Full nav (Players / Games links) comes in a later step. */}
+        <nav aria-label="Directory" className="sr-only">
+          Directory navigation placeholder
+        </nav>
+      </header>
+      <main>
+        <Outlet />
+      </main>
+    </>
+  )
+}
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en">
       <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <HeadContent />
       </head>
-      <body className="font-sans antialiased [overflow-wrap:anywhere] selection:bg-[rgba(79,184,178,0.24)]">
-        <Header />
+      <body className="font-sans antialiased">
         {children}
-        <Footer />
-        <TanStackDevtools
-          config={{
-            position: 'bottom-right',
-          }}
-          plugins={[
-            {
-              name: 'Tanstack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-          ]}
-        />
         <Scripts />
       </body>
     </html>
