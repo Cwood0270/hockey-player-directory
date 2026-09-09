@@ -1,13 +1,22 @@
-node_modules
-.DS_Store
-dist
-dist-ssr
-*.local
+# Dependencies and build output
+node_modules/
+dist/
+dist-ssr/
+.output/
+.vinxi/
+.nitro/
+.tanstack/
+.wrangler/
+.vercel/
+
+# Never commit real env files
 .env
-.nitro
-.tanstack
-.wrangler
-.output
-.vinxi
+.env.local
+.env.*.local
+*.local
+
+# OS / editor noise
+.DS_Store
+*.log
 __unconfig*
 todos.json
