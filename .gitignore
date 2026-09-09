@@ -20,3 +20,4 @@ dist-ssr/
 *.log
 __unconfig*
 todos.json
+.vercel
