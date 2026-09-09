@@ -1,45 +1,33 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
 
 import { validateGamesSearch } from '../../lib/searchSchemas'
+import { getPlayerById, listGames } from '../../server/directoryLoader'
 
 export const Route = createFileRoute('/games/')({
   validateSearch: (search: Record<string, unknown>) =>
     validateGamesSearch(search),
+  loaderDeps: ({ search: { when, team, date } }) => ({ when, team, date }),
+  loader: ({ deps }) => ({
+    games: listGames(deps),
+  }),
   component: GamesIndexPage,
 })
 
-const demoGames = [
-  {
-    id: 'game-tor-0320',
-    opponent: 'TOR',
-    date: '2026-03-20',
-    when: 'upcoming',
-    playerId: 'player-00',
-  },
-  {
-    id: 'game-bos-0210',
-    opponent: 'BOS',
-    date: '2026-02-10',
-    when: 'past',
-    playerId: 'player-01',
-  },
-] as const
+function gameWhenLabel(date: string): 'past' | 'upcoming' {
+  const today = new Date().toISOString().slice(0, 10)
+  return date >= today ? 'upcoming' : 'past'
+}
 
 function GamesIndexPage() {
   const { when, team, date } = Route.useSearch()
-  const visibleGames = demoGames.filter((game) => {
-    const whenMatch = when === 'both' || game.when === when
-    const teamMatch = team === '' || game.opponent === team
-    const dateMatch = date === '' || game.date === date
-    return whenMatch && teamMatch && dateMatch
-  })
+  const { games } = Route.useLoaderData()
 
   return (
     <main className="mx-auto max-w-3xl p-6">
       <h1 className="text-2xl font-bold text-slate-900">Games</h1>
       <p className="mt-2 text-slate-600">
-        Schedule view shell for upcoming and recent games. Filters are
-        bookmarkable query params on this URL.
+        Schedule view for upcoming and recent games. Filters are bookmarkable
+        query params on this URL.
       </p>
       <p className="mt-3 text-sm text-slate-700">
         Filters: when={when}, team={team || '(all)'}, date={date || '(any)'}
@@ -88,25 +76,28 @@ function GamesIndexPage() {
           Clear filters
         </Link>
       </nav>
-      {visibleGames.length === 0 ? (
+      {games.length === 0 ? (
         <p className="mt-4 rounded-md bg-slate-100 p-3 text-sm text-slate-700">
-          No placeholder games match these filters. Seed data arrives in a
-          later step.
+          No seeded games match these filters.
         </p>
       ) : (
         <ul className="mt-4 list-disc space-y-1 pl-5 text-slate-700">
-          {visibleGames.map((game) => (
-            <li key={game.id}>
-              vs {game.opponent} — {game.date} ({game.when}) — player{' '}
-              <Link
-                to="/players/$playerId"
-                params={{ playerId: game.playerId }}
-                className="text-sky-700 underline"
-              >
-                {game.playerId}
-              </Link>
-            </li>
-          ))}
+          {games.map((game) => {
+            const linkedPlayer = getPlayerById(game.playerId)
+            return (
+              <li key={game.id}>
+                vs {game.opponent} — {game.date} ({gameWhenLabel(game.date)},{' '}
+                {game.venue}) — player{' '}
+                <Link
+                  to="/players/$playerId"
+                  params={{ playerId: game.playerId }}
+                  className="text-sky-700 underline"
+                >
+                  {linkedPlayer?.name ?? game.playerId}
+                </Link>
+              </li>
+            )
+          })}
         </ul>
       )}
     </main>
