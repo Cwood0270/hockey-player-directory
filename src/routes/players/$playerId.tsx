@@ -2,6 +2,7 @@
 
 import { createFileRoute, Link } from '@tanstack/react-router'
 
+import { NotFoundPlayer } from '../../components/NotFoundPlayer'
 import { parsePlayerIdParam } from '../../lib/playerParams'
 import { getPlayerById } from '../../server/directoryLoader'
 
@@ -29,18 +30,7 @@ function PlayerDetailPage() {
   if (!player) {
     return (
       <main className="mx-auto max-w-3xl p-6">
-        <p className="mb-4 text-sm">
-          <Link to="/players" className="text-sky-700 underline">
-            ← Back to players
-          </Link>
-        </p>
-        <h1 className="text-2xl font-bold text-slate-900">Player not found</h1>
-        <p className="mt-2 text-slate-600">
-          No roster sheet exists for{' '}
-          <span className="font-mono font-medium text-slate-900">{playerId}</span>
-          . Check the id and try a seeded URL such as{' '}
-          <span className="font-mono">/players/player-00</span>.
-        </p>
+        <NotFoundPlayer playerId={playerId} />
       </main>
     )
   }
@@ -60,6 +50,20 @@ function PlayerDetailPage() {
       <p className="mt-4 text-slate-700">
         #{player.number} — {player.position} — {player.team} ({player.status})
       </p>
+      <p className="mt-6">
+        <Link
+          to="/games"
+          search={{
+            when: 'both',
+            team: '',
+            date: '',
+            playerId: player.id,
+          }}
+          className="font-medium text-sky-700 underline underline-offset-2"
+        >
+          View {player.name}&apos;s games
+        </Link>
+      </p>
     </main>
   )
 }
@@ -67,17 +71,7 @@ function PlayerDetailPage() {
 function InvalidPlayerId() {
   return (
     <main className="mx-auto max-w-3xl p-6">
-      <p className="mb-4 text-sm">
-        <Link to="/players" className="text-sky-700 underline">
-          ← Back to players
-        </Link>
-      </p>
-      <h1 className="text-2xl font-bold text-slate-900">Invalid player id</h1>
-      <p className="mt-2 text-slate-600">
-        That player URL is missing a valid <span className="font-mono">playerId</span>.
-        Use a non-empty id in the path, such as{' '}
-        <span className="font-mono">/players/player-00</span>.
-      </p>
+      <NotFoundPlayer playerId="(empty or invalid)" />
     </main>
   )
 }

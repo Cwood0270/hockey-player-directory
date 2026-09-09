@@ -7,7 +7,10 @@ import {
 import type { GamesSearch, PlayersSearch } from '../lib/searchSchemas'
 
 export type PlayerListFilters = Pick<PlayersSearch, 'position' | 'status'>
-export type GameListFilters = Pick<GamesSearch, 'when' | 'team' | 'date'>
+export type GameListFilters = Pick<
+  GamesSearch,
+  'when' | 'team' | 'date' | 'playerId'
+>
 
 function todayIsoDate(now = new Date()): string {
   return now.toISOString().slice(0, 10)
@@ -51,6 +54,10 @@ export function listGames(
 
   if (filters?.date) {
     rows = rows.filter((game) => game.date === filters.date)
+  }
+
+  if (filters?.playerId) {
+    rows = rows.filter((game) => game.playerId === filters.playerId)
   }
 
   const upcoming = rows

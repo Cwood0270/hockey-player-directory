@@ -12,12 +12,14 @@ Search params filter list pages. They are not path params: `/players/$playerId` 
 
 ## Games `/games`
 
-- **Keys:** `when`, `team`, `date`
+- **Keys:** `when`, `team`, `date`, `playerId`
 - **when:** `past` | `upcoming` | `both` (default `both`) — from the requirements brief
 - **team:** club code string, default `''` (all clubs). Values are trimmed and uppercased.
 - **date:** `YYYY-MM-DD` or `''` (default `''`). Any other string is ignored.
+- **playerId:** seed id such as `player-00`, default `''` (all players). Empty/whitespace falls back to `''`.
 - **Bad values:** ignored; that key uses its default. Unknown keys are ignored.
 - **Example bookmark:** `/games?when=upcoming&team=TOR&date=2026-03-20`
+- **Player context bookmark:** `/games?playerId=player-00`
 
 ## Assessment
 

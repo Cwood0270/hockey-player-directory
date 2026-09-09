@@ -18,6 +18,8 @@ export type GamesSearch = {
   team: string
   // '' or 'YYYY-MM-DD'
   date: string
+  // Empty means all players; otherwise a seed id like "player-00"
+  playerId: string
 }
 
 const PLAYER_POSITIONS = new Set(['F', 'D', 'G', 'all'])
@@ -34,6 +36,7 @@ export const defaultGamesSearch = (): GamesSearch => ({
   when: 'both',
   team: '',
   date: '',
+  playerId: '',
 })
 
 /**
@@ -69,5 +72,7 @@ export function validateGamesSearch(raw: Record<string, unknown>): GamesSearch {
     typeof raw.team === 'string' ? raw.team.trim().toUpperCase() : defaults.team
   const dateRaw = typeof raw.date === 'string' ? raw.date.trim() : ''
   const date = /^\d{4}-\d{2}-\d{2}$/.test(dateRaw) ? dateRaw : defaults.date
-  return { team, date, when }
+  const playerIdRaw = typeof raw.playerId === 'string' ? raw.playerId.trim() : ''
+  const playerId = playerIdRaw || defaults.playerId
+  return { team, date, when, playerId }
 }
